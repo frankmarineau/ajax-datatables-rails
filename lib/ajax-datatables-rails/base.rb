@@ -37,7 +37,7 @@ module AjaxDatatablesRails
     def as_json(options = {})
       {
         recordsTotal: get_raw_records.count(:all),
-        recordsFiltered: get_raw_records.model.from("(#{filter_records(get_raw_records).except(:limit, :offset, :order).to_sql}) AS foo").count,
+        recordsFiltered: ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM (SELECT DISTINCT ON (t0_r0) * FROM (#{filter_records(get_raw_records).except(:limit, :offset, :order).to_sql}) AS foo) AS bar")[0]['count'],
         data: data
       }
     end
